@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -13,6 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import model.beans.FlightBean;
 import view.MainView;
 
 public class FlightPage extends JPanel implements MouseListener {
@@ -28,6 +35,10 @@ public class FlightPage extends JPanel implements MouseListener {
 	private JTextField jtfArriva;
 	private JLabel jlTurn;
 	private JLabel jlSearch;
+	private JPanel jlFlights;
+	
+	private String currentStart = "南京";
+	private String currentArriva = "西安";
 	
 	public FlightPage(JFrame f) {
 		// TODO Auto-generated constructor stub
@@ -37,7 +48,7 @@ public class FlightPage extends JPanel implements MouseListener {
 		this.setBackground(new Color(240, 240, 240));
 		this.setLayout(null);
 		
-		jtfStart = new JTextField("西安", JTextField.CENTER);
+		jtfStart = new JTextField(currentStart, JTextField.CENTER);
 		jtfStart.setBackground(Color.WHITE);
 		jtfStart.setFont(new Font("", 1, 24));
 		jtfStart.setBorder(null);
@@ -53,7 +64,7 @@ public class FlightPage extends JPanel implements MouseListener {
 		jlTurn.setBounds(420, 40, 50, 50);
 		jlTurn.addMouseListener(this);
 		
-		jtfArriva = new JTextField("南京", JTextField.CENTER);
+		jtfArriva = new JTextField(currentArriva, JTextField.CENTER);
 		jtfArriva.setBackground(Color.WHITE);
 		jtfArriva.setFont(new Font("", 1, 24));
 		jtfArriva.setBorder(null);
@@ -73,45 +84,35 @@ public class FlightPage extends JPanel implements MouseListener {
 		jpTop.setBounds(0, 0, 1060, 120);
 		jpTop.setBackground(Color.WHITE);
 
-		int size = 10;
-		JPanel jlFlights = new JPanel(null);
+		Map<String, String> args = new HashMap<>();
+		args.put("departureCity", jtfStart.getText());
+		args.put("destinationCity", jtfArriva.getText());
+		RequestMsg request = new RequestMsg(RequestMsg.SEARCH_FLIGHT);
+		request.setArgs(args);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle();
+		@SuppressWarnings("unchecked")
+		LinkedList<FlightBean> flightBeans = (LinkedList<FlightBean>) response.getData();
+		
+		jlFlights = new JPanel(null);
 		jlFlights.setBackground(new Color(255, 255, 255));
-		jlFlights.setPreferredSize(new Dimension(1000, size * 100));
-		FlightLabel flightLabel0 = new FlightLabel();
-		flightLabel0.setBounds(20, 0, 1000, 100);
-		FlightLabel flightLabel1 = new FlightLabel();
-		flightLabel1.setBounds(20, 100, 1000, 100);
-		FlightLabel flightLabel2 = new FlightLabel();
-		flightLabel2.setBounds(20, 200, 1000, 100);
-		FlightLabel flightLabel3 = new FlightLabel();
-		flightLabel3.setBounds(20, 300, 1000, 100);
-		FlightLabel flightLabel4 = new FlightLabel();
-		flightLabel4.setBounds(20, 400, 1000, 100);
-		FlightLabel flightLabel5 = new FlightLabel();
-		flightLabel5.setBounds(20, 500, 1000, 100);
-		FlightLabel flightLabel6 = new FlightLabel();
-		flightLabel6.setBounds(20, 600, 1000, 100);
-		FlightLabel flightLabel7 = new FlightLabel();
-		flightLabel7.setBounds(20, 700, 1000, 100);
-		FlightLabel flightLabel8 = new FlightLabel();
-		flightLabel8.setBounds(20, 800, 1000, 100);
-		FlightLabel flightLabel9 = new FlightLabel();
-		flightLabel9.setBounds(20, 900, 1000, 100);
-		jlFlights.add(flightLabel0);
-		jlFlights.add(flightLabel1);
-		jlFlights.add(flightLabel2);
-		jlFlights.add(flightLabel3);
-		jlFlights.add(flightLabel4);
-		jlFlights.add(flightLabel5);
-		jlFlights.add(flightLabel6);
-		jlFlights.add(flightLabel7);
-		jlFlights.add(flightLabel8);
-		jlFlights.add(flightLabel9);
+		int count = 0;
+		while(flightBeans != null && !flightBeans.isEmpty()) {
+			FlightBean flightBean = flightBeans.pollFirst();
+			float fp = flightBean.getPrice();
+			FlightLabel flightLabel = new FlightLabel(flightBean.getFlightNumber(), 
+					flightBean.getDepartureTime(), flightBean.getDestinationTime(), (int) fp + "");
+			flightLabel.setBounds(20, count * 100, 1000, 100);
+			jlFlights.add(flightLabel);
+			count++;
+		}
+		
+		jlFlights.setPreferredSize(new Dimension(1000, count * 100));
 		JScrollPane jspFlights = new JScrollPane(jlFlights);
 		jspFlights.setBounds(1, 140, 1050, 610);
 		jspFlights.setBorder(null);
 		jspFlights.doLayout();
-		
+		jspFlights.getVerticalScrollBar().setUnitIncrement(10);
 		
 		this.add(jlLineS);
 		this.add(jlLineA);
@@ -144,7 +145,47 @@ public class FlightPage extends JPanel implements MouseListener {
 			jtfArriva.setText(start);
 		}
 		else if(e.getSource().equals(jlSearch)) {
-			
+			if(jtfStart.getText().equals(currentStart) && jtfArriva.getText().equals(currentArriva)) {
+				
+			}
+			else {
+				currentStart = jtfStart.getText();
+				currentArriva = jtfArriva.getText();
+				Map<String, String> args = new HashMap<>();
+				args.put("departureCity", currentStart);
+				args.put("destinationCity", currentArriva);
+				RequestMsg request = new RequestMsg(RequestMsg.SEARCH_FLIGHT);
+				request.setArgs(args);
+				request.sendRequest();
+				ResponseMsg response = Controller.handle();
+				@SuppressWarnings("unchecked")
+				LinkedList<FlightBean> flightBeans = (LinkedList<FlightBean>) response.getData();
+				
+				jlFlights.removeAll();
+				jlFlights.repaint();
+				int count = 0;
+				while(flightBeans != null && !flightBeans.isEmpty()) {
+					FlightBean flightBean = flightBeans.pollFirst();
+					float fp = flightBean.getPrice();
+					FlightLabel flightLabel = new FlightLabel(flightBean.getFlightNumber(), 
+							flightBean.getDepartureTime(), flightBean.getDestinationTime(), (int) fp + "");
+					flightLabel.setBounds(20, count * 100, 1000, 100);
+					jlFlights.add(flightLabel);
+					count++;
+				}
+				if(count == 0) {
+					jlFlights.setPreferredSize(new Dimension(1000, 600));
+					JLabel label = new JLabel(response.getMsg(), JLabel.CENTER);
+					label.setIcon(new ImageIcon("./icons/uncomplete.png"));
+					label.setFont(new Font("Consolas", 1, 25));
+					label.setForeground(Color.DARK_GRAY);
+					label.setBounds(0, 0, 1000, 200);
+					jlFlights.add(label);
+				}
+				else {
+					jlFlights.setPreferredSize(new Dimension(1000, count * 100));
+				}
+			}
 		}
 	}
 

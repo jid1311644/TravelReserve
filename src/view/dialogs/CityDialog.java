@@ -4,14 +4,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,7 +55,7 @@ public class CityDialog extends JDialog {
 		
 		JPanel jpCities = new JPanel(null);
 		jpCities.setBackground(new Color(250, 250, 250));
-		jpCities.setPreferredSize(new Dimension(400, 1700));
+		jpCities.setPreferredSize(new Dimension(400, 700));
 		int i = 0;
 		for(String s: MainView.cities) {
 			JLabel jlCity = new JLabel(s, JLabel.CENTER);
@@ -73,6 +69,7 @@ public class CityDialog extends JDialog {
 		jspCities.setBounds(2, 42, 496, 305);
 		jspCities.setBorder(null);
 		jspCities.doLayout();
+		jspCities.getVerticalScrollBar().setUnitIncrement(10);
 		
 		jPanel.add(jlTitle);
 		jPanel.add(jlTitleLine);

@@ -19,7 +19,7 @@ import view.dialogs.ReserveFlightDialog;
 public class FlightLabel extends JPanel {
 
 	private ImageIcon arrow = new ImageIcon("./icons/arrow.png");
-	private ImageIcon price = new ImageIcon("./icons/price_icon.png");
+	private ImageIcon price_icon = new ImageIcon("./icons/price_icon.png");
 	
 	private JLabel jlFlightNumber;
 	private JLabel jlStartTime;
@@ -28,9 +28,13 @@ public class FlightLabel extends JPanel {
 	private JLabel jlTime;
 	private JLabel jlPriceIcon;
 	private JLabel jlPrice;
+	
+	private String flightNumber;
 
-	public FlightLabel() {
+	public FlightLabel(String flightNum, String departureTime, String destinationTime, String price) {
 		// TODO Auto-generated constructor stub
+		this.flightNumber = flightNum;
+		
 		this.setLayout(null);
 		this.setSize(1000, 100);
 		this.setBackground(Color.WHITE);
@@ -65,20 +69,20 @@ public class FlightLabel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				ReserveFlightDialog dialog = new ReserveFlightDialog();
+				ReserveFlightDialog dialog = new ReserveFlightDialog(flightNumber);
 				dialog.setVisible(true);
 			}
 		});
 		
-		jlFlightNumber = new JLabel("¼ªÏéº½MU23C88", JLabel.CENTER);
+		jlFlightNumber = new JLabel(flightNum, JLabel.CENTER);
 		jlFlightNumber.setFont(new Font("Consola", 0, 20));
 		jlFlightNumber.setBounds(30, 35, 150, 30);
 		
-		jlStartTime = new JLabel("23:45", JLabel.CENTER);
+		jlStartTime = new JLabel(departureTime, JLabel.CENTER);
 		jlStartTime.setFont(new Font("Consola", 0, 30));
 		jlStartTime.setBounds(345, 25, 80, 50);
 		
-		jlArrivaTime = new JLabel("01:55", JLabel.CENTER);
+		jlArrivaTime = new JLabel(destinationTime, JLabel.CENTER);
 		jlArrivaTime.setFont(new Font("Consola", 0, 30));
 		jlArrivaTime.setBounds(575, 25, 80, 50);
 		
@@ -108,10 +112,10 @@ public class FlightLabel extends JPanel {
 		jlArrow = new JLabel(arrow, JLabel.CENTER);
 		jlArrow.setBounds(425, 55, 150, 10);
 		
-		jlPriceIcon = new JLabel(price, JLabel.CENTER);
+		jlPriceIcon = new JLabel(price_icon, JLabel.CENTER);
 		jlPriceIcon.setBounds(860, 45, 20, 20);
 		
-		jlPrice = new JLabel("1080", JLabel.CENTER);
+		jlPrice = new JLabel(price, JLabel.CENTER);
 		jlPrice.setFont(new Font("Consola", 1, 30));
 		jlPrice.setForeground(new Color(255, 130, 5));
 		jlPrice.setBounds(880, 35, 70, 30);

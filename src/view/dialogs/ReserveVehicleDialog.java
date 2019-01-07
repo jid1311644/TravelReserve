@@ -7,12 +7,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import model.beans.VehicleBean;
+import view.MainView;
 
 public class ReserveVehicleDialog extends JDialog implements MouseListener, ActionListener {
 	
@@ -33,11 +42,13 @@ public class ReserveVehicleDialog extends JDialog implements MouseListener, Acti
 	
 	private int freeSeats = 10;
 	private boolean isBus;
+	private String plateNumber;
 	
-	public ReserveVehicleDialog(boolean isBus) {
+	public ReserveVehicleDialog(String plate, boolean isbus) {
 		// TODO Auto-generated constructor stub
-		this.isBus = isBus;
+		this.isBus = isbus;
 		this.dialog = this;
+		this.plateNumber = plate;
 		
 		setSize(400,200);
 		setResizable(false);
@@ -49,10 +60,17 @@ public class ReserveVehicleDialog extends JDialog implements MouseListener, Acti
 		int y = (h - 200) / 2;
 		setLocation(x, y);
 		
-		jlCarType = new JLabel("小轿车");
+		Map<String, String> args = new HashMap<>();
+		args.put("plateNumber", plate);
+		RequestMsg request = new RequestMsg(RequestMsg.SELECT_VEHICLE);
+		request.setArgs(args);
+		request.sendRequest();
+		VehicleBean vb = (VehicleBean) Controller.handle().getData();
+		
+		jlCarType = new JLabel(vb.getCarType());
 		jlCarType.setFont(new Font("", 1, 18));
 		jlCarType.setBounds(30, 30, 80, 20);
-		jlCarPlate = new JLabel("京A·77801");
+		jlCarPlate = new JLabel(plate);
 		jlCarPlate.setFont(new Font("", 0, 14));
 		jlCarPlate.setBounds(30, 50, 80, 14);
 		
@@ -83,6 +101,13 @@ public class ReserveVehicleDialog extends JDialog implements MouseListener, Acti
 			jlSubIcon.setVisible(false);
 			jlNum.setVisible(false);
 			jlAddIcon.setVisible(false);
+		}
+		else {
+			request = new RequestMsg(RequestMsg.SELECT_BUS_FREE_SEAT);
+			request.setArgs(args);
+			request.sendRequest();
+			freeSeats = (int) Controller.handle().getData();
+			jlFreeSeat.setText("还剩" + freeSeats + "个座位");
 		}
 		
 		jbSelect = new JButton("提交订单");
@@ -173,7 +198,35 @@ public class ReserveVehicleDialog extends JDialog implements MouseListener, Acti
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+		Map<String, String> args = new HashMap<>();
+		args.put("username", MainView.currentUser);
+		args.put("isBus", isBus + "");
+		args.put("plateNumber", plateNumber);
+		if(isBus) {
+			int n = Integer.parseInt(jlNum.getText());
+			if(n == 0) {
+				
+			}
+			else {
+				args.put("ticket", n + "");
+			}
+		}
+		else {
+			args.put("ticket", "-1");
+		}
+		RequestMsg request = new RequestMsg(RequestMsg.RESERVE_VEHICLE);
+		request.setArgs(args);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle().sendResponse();
+		if(response.getResult().equals("success")) {
+			JOptionPane.showMessageDialog(dialog, response.getMsg(),
+					"", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			JOptionPane.showMessageDialog(dialog, response.getMsg(),
+					"", JOptionPane.ERROR_MESSAGE);
+		}
+		dialog.setVisible(false);
 	}
 
 }

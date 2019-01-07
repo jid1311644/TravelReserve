@@ -13,6 +13,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -22,6 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.event.MouseInputListener;
+
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import view.MainView;
+import view.dialogs.PersonInfoDialog;
 
 public class SignInUp extends JFrame implements MouseListener, KeyListener, FocusListener{
 	
@@ -170,10 +178,43 @@ public class SignInUp extends JFrame implements MouseListener, KeyListener, Focu
 			System.exit(0);
 		}
 		else if(e.getSource().equals(btnLogin)) {
-			
+			String name = jtfUser.getText();
+			String psw = new String(jpfPsw.getPassword());
+			if(name.equals("") || psw.equals("")) {
+				
+			}
+			else {
+				Map<String, String> reqArgs = new HashMap<String, String>();
+				reqArgs.put("username", name);
+				reqArgs.put("password", psw);
+				RequestMsg request = new RequestMsg(RequestMsg.LOGIN);
+				request.setArgs(reqArgs);
+				request.sendRequest();
+				ResponseMsg response = Controller.handle();
+				
+				if(response.getResult().equals("success")) {
+					JOptionPane.showMessageDialog(frame, response.getMsg(),
+							"", JOptionPane.INFORMATION_MESSAGE);
+					MainView.currentUser = name;
+					new MainView().setVisible(true);
+					this.setVisible(false);
+				}
+				else {
+					JOptionPane.showMessageDialog(frame, response.getMsg(),
+							"", JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 		else if(e.getSource().equals(btnSignUp)) {
-			
+			String name = jtfUser.getText();
+			String psw = new String(jpfPsw.getPassword());
+			if(name.equals("") || psw.equals("")) {
+				
+			}
+			else {
+				PersonInfoDialog dialog = new PersonInfoDialog(frame, name, psw);
+				dialog.setVisible(true);
+			}
 		}
 		
 		else if(e.getSource().equals(jlSignUp)) {
@@ -412,10 +453,6 @@ public class SignInUp extends JFrame implements MouseListener, KeyListener, Focu
 		
 	}
 
-	public static void main(String[] args) {
-		new SignInUp().setVisible(true);
-	}
-	
 }
 
 

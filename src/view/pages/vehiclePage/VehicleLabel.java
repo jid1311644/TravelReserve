@@ -12,7 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import view.dialogs.ReserveHotelDialog;
+import model.beans.VehicleBean;
 import view.dialogs.ReserveVehicleDialog;
 
 public class VehicleLabel extends JPanel {
@@ -22,20 +22,17 @@ public class VehicleLabel extends JPanel {
 	private ImageIcon car3 = new ImageIcon("./icons/car3.png");
 	private ImageIcon car4 = new ImageIcon("./icons/car4.png");
 	private ImageIcon bus = new ImageIcon("./icons/bus.png");
-	private ImageIcon price = new ImageIcon("./icons/hotel_price.png");
+	private ImageIcon price_icon = new ImageIcon("./icons/hotel_price.png");
 
 	private JLabel jlCarIcon;
 	private JLabel jlCarType;
 	private JLabel jlCarPlate;
 	private JLabel jlCarPrice;
 	
+	private boolean isBus = false;
 	
-	private boolean isBus;
-	
-	public VehicleLabel(boolean isBus) {
+	public VehicleLabel(String carType, String plateNumber, String destination, float price) {
 		// TODO Auto-generated constructor stub
-		this.isBus = isBus;
-		
 		this.setLayout(null);
 		this.setSize(1000, 100);
 		this.setBackground(Color.WHITE);
@@ -70,7 +67,7 @@ public class VehicleLabel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				ReserveVehicleDialog dialog = new ReserveVehicleDialog(true);
+				ReserveVehicleDialog dialog = new ReserveVehicleDialog(plateNumber, isBus);
 				dialog.setVisible(true);
 			}
 		});
@@ -78,37 +75,44 @@ public class VehicleLabel extends JPanel {
 		jlCarIcon = new JLabel(car1, JLabel.CENTER);
 		jlCarIcon.setBounds(20, 15, 70, 70);
 		ImageIcon[] carIcons = {car1, car2, car3, car4};
-		if(isBus) {
+		
+		JLabel jlPriceHint = new JLabel("/千米");
+		JLabel jlBusDestination = new JLabel("");
+		if(carType.equals(VehicleBean.BUS)) {
+			isBus = true;
 			jlCarIcon.setIcon(bus);
+			jlPriceHint.setText("/人");
+			jlBusDestination.setVisible(true);
 		}
 		else {
+			isBus = false;
 			jlCarIcon.setIcon(carIcons[new Random().nextInt(4) % 4]);
+			jlPriceHint.setText("/千米");
+			jlBusDestination.setVisible(false);
 		}
 		
-		jlCarType = new JLabel("商务车");
+		jlCarType = new JLabel(carType);
 		jlCarType.setFont(new Font("宋体", 1, 20));
-		jlCarType.setBounds(140, 30, 700, 20);
+		jlCarType.setBounds(140, 30, 100, 20);
 		
-		jlCarPlate = new JLabel("京A·14490");
+		jlCarPlate = new JLabel(plateNumber);
 		jlCarPlate.setForeground(new Color(85, 85, 85));
 		jlCarPlate.setFont(new Font("宋体", 0, 16));
-		jlCarPlate.setBounds(140, 60, 700, 20);
+		jlCarPlate.setBounds(140, 60, 100, 16);
 		
-		JLabel jlPriceIcon = new JLabel(price, JLabel.CENTER);
+		jlBusDestination.setText("目的地：" + destination);
+		jlBusDestination.setForeground(new Color(48, 151, 187));
+		jlBusDestination.setFont(new Font("宋体", 0, 14));
+		jlBusDestination.setBounds(250, 62, 600, 14);
+		
+		JLabel jlPriceIcon = new JLabel(price_icon, JLabel.CENTER);
 		jlPriceIcon.setBounds(850, 45, 20, 20);
 		
-		jlCarPrice = new JLabel("6.00", JLabel.CENTER);
+		jlCarPrice = new JLabel(price + "", JLabel.CENTER);
 		jlCarPrice.setFont(new Font("Consola", 1, 30));
 		jlCarPrice.setForeground(new Color(30, 146, 195));
 		jlCarPrice.setBounds(870, 35, 70, 30);
 		
-		JLabel jlPriceHint = new JLabel("/千米");
-		if(isBus) {
-			jlPriceHint.setText("/人");
-		}
-		else {
-			jlPriceHint.setText("/千米");
-		}
 		jlPriceHint.setFont(new Font("", 0, 16));
 		jlPriceHint.setForeground(new Color(30, 146, 195));
 		jlPriceHint.setBounds(950, 49, 40, 16);
@@ -121,6 +125,7 @@ public class VehicleLabel extends JPanel {
 		this.add(jlCarIcon);
 		this.add(jlCarType);
 		this.add(jlCarPlate);
+		this.add(jlBusDestination);
 		this.add(jlPriceIcon);
 		this.add(jlCarPrice);
 		this.add(jlPriceHint);

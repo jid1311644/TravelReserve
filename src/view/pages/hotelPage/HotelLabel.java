@@ -27,7 +27,7 @@ public class HotelLabel extends JPanel {
 	private JLabel jlAddress;
 	private JLabel jlPrice;
 	
-	public HotelLabel() {
+	public HotelLabel(String id, String name, String address, int floorPrice) {
 		// TODO Auto-generated constructor stub
 		this.setLayout(null);
 		this.setSize(1000, 100);
@@ -63,7 +63,7 @@ public class HotelLabel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				ReserveHotelDialog dialog = new ReserveHotelDialog();
+				ReserveHotelDialog dialog = new ReserveHotelDialog(id);
 				dialog.setVisible(true);
 			}
 		});
@@ -73,11 +73,11 @@ public class HotelLabel extends JPanel {
 		ImageIcon[] hotelIcons = {hotel1, hotel2, hotel3};
 		jlIcon.setIcon(hotelIcons[new Random().nextInt(3) % 3]);
 		
-		jlName = new JLabel("百捷快捷酒店");
+		jlName = new JLabel(name);
 		jlName.setFont(new Font("宋体", 1, 20));
 		jlName.setBounds(120, 30, 700, 20);
 		
-		jlAddress = new JLabel("位于北京市东城区法华南里10号");
+		jlAddress = new JLabel(address);
 		jlAddress.setForeground(new Color(85, 85, 85));
 		jlAddress.setFont(new Font("宋体", 0, 14));
 		jlAddress.setBounds(120, 60, 700, 20);
@@ -85,7 +85,7 @@ public class HotelLabel extends JPanel {
 		JLabel jlPriceIcon = new JLabel(price, JLabel.CENTER);
 		jlPriceIcon.setBounds(850, 45, 20, 20);
 		
-		jlPrice = new JLabel("1080", JLabel.CENTER);
+		jlPrice = new JLabel(floorPrice + "", JLabel.CENTER);
 		jlPrice.setFont(new Font("Consola", 1, 30));
 		jlPrice.setForeground(new Color(30, 146, 195));
 		jlPrice.setBounds(870, 35, 70, 30);

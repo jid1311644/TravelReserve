@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,6 +17,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import model.beans.VehicleBean;
 import view.MainView;
 
 public class VehiclePage extends JPanel implements MouseListener{
@@ -28,7 +35,10 @@ public class VehiclePage extends JPanel implements MouseListener{
 	private JTextField jtfCity;
 	private JLabel jlSearch;
 	private JButton jbBus;
+	private JPanel jlVehicles;
 	
+	private String currentCity = "南京";
+	private String currentIsBus = "false";
 	private boolean isBus = false;
 	
 	public VehiclePage(JFrame f) {
@@ -38,7 +48,7 @@ public class VehiclePage extends JPanel implements MouseListener{
 		this.setBackground(new Color(240, 240, 240));
 		this.setLayout(null);
 		
-		jtfCity = new JTextField("北京", JTextField.CENTER);
+		jtfCity = new JTextField(currentCity, JTextField.CENTER);
 		jtfCity.setBackground(Color.WHITE);
 		jtfCity.setFont(new Font("", 1, 24));
 		jtfCity.setBorder(null);
@@ -68,44 +78,34 @@ public class VehiclePage extends JPanel implements MouseListener{
 		jpTop.setBounds(0, 0, 1060, 120);
 		jpTop.setBackground(Color.WHITE);
 		
-		int size = 10;
-		JPanel jlVehicles = new JPanel(null);
+		Map<String, String> args = new HashMap<>();
+		args.put("location", currentCity);
+		args.put("isBus", currentIsBus);
+		RequestMsg request = new RequestMsg(RequestMsg.SEARCH_VEHICLE);
+		request.setArgs(args);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle();
+		@SuppressWarnings("unchecked")
+		LinkedList<VehicleBean> vehicleBeans = (LinkedList<VehicleBean>) response.getData();
+		
+		jlVehicles = new JPanel(null);
 		jlVehicles.setBackground(new Color(255, 255, 255));
-		jlVehicles.setPreferredSize(new Dimension(1000, size * 100));
-		VehicleLabel hotelLabel0 = new VehicleLabel(isBus);
-		hotelLabel0.setBounds(20, 0, 1000, 100);
-		VehicleLabel hotelLabel1 = new VehicleLabel(true);
-		hotelLabel1.setBounds(20, 100, 1000, 100);
-		VehicleLabel hotelLabel2 = new VehicleLabel(isBus);
-		hotelLabel2.setBounds(20, 200, 1000, 100);
-		VehicleLabel hotelLabel3 = new VehicleLabel(isBus);
-		hotelLabel3.setBounds(20, 300, 1000, 100);
-		VehicleLabel hotelLabel4 = new VehicleLabel(true);
-		hotelLabel4.setBounds(20, 400, 1000, 100);
-		VehicleLabel hotelLabel5 = new VehicleLabel(isBus);
-		hotelLabel5.setBounds(20, 500, 1000, 100);
-		VehicleLabel hotelLabel6 = new VehicleLabel(isBus);
-		hotelLabel6.setBounds(20, 600, 1000, 100);
-		VehicleLabel hotelLabel7 = new VehicleLabel(true);
-		hotelLabel7.setBounds(20, 700, 1000, 100);
-		VehicleLabel hotelLabel8 = new VehicleLabel(isBus);
-		hotelLabel8.setBounds(20, 800, 1000, 100);
-		VehicleLabel hotelLabel9 = new VehicleLabel(true);
-		hotelLabel9.setBounds(20, 900, 1000, 100);
-		jlVehicles.add(hotelLabel0);
-		jlVehicles.add(hotelLabel1);
-		jlVehicles.add(hotelLabel2);
-		jlVehicles.add(hotelLabel3);
-		jlVehicles.add(hotelLabel4);
-		jlVehicles.add(hotelLabel5);
-		jlVehicles.add(hotelLabel6);
-		jlVehicles.add(hotelLabel7);
-		jlVehicles.add(hotelLabel8);
-		jlVehicles.add(hotelLabel9);
+		int count = 0;
+		while(vehicleBeans != null && !vehicleBeans.isEmpty()) {
+			VehicleBean vehicleBean = vehicleBeans.pollFirst();
+			VehicleLabel vehicleLabel = new VehicleLabel(vehicleBean.getCarType(), 
+					vehicleBean.getPlateNumber(), vehicleBean.getDestination(), vehicleBean.getPrice());
+			vehicleLabel.setBounds(20, count * 100, 1000, 100);
+			jlVehicles.add(vehicleLabel);
+			count++;
+		}
+		
+		jlVehicles.setPreferredSize(new Dimension(1000, count * 100));
 		JScrollPane jspVehicles = new JScrollPane(jlVehicles);
 		jspVehicles.setBounds(1, 140, 1050, 610);
 		jspVehicles.setBorder(null);
 		jspVehicles.doLayout();
+		jspVehicles.getVerticalScrollBar().setUnitIncrement(10);
 		
 		this.add(jlLine);
 		this.add(jtfCity);
@@ -133,6 +133,49 @@ public class VehiclePage extends JPanel implements MouseListener{
 			else {
 				jbBus.setIcon(select_bus);
 				isBus = true;
+			}
+		}
+		else if(e.getSource().equals(jlSearch)) {
+			if(currentCity.equals(jtfCity.getText()) && currentIsBus.equals(isBus + "")) {
+				
+			}
+			else {
+				currentCity = jtfCity.getText();
+				currentIsBus = isBus + "";
+				Map<String, String> args = new HashMap<>();
+				args.put("location", currentCity);
+				args.put("isBus", currentIsBus);
+				RequestMsg request = new RequestMsg(RequestMsg.SEARCH_VEHICLE);
+				request.setArgs(args);
+				request.sendRequest();
+				ResponseMsg response = Controller.handle();
+				@SuppressWarnings("unchecked")
+				LinkedList<VehicleBean> vehicleBeans = (LinkedList<VehicleBean>) response.getData();
+				
+				jlVehicles.removeAll();
+				jlVehicles.repaint();
+				int count = 0;
+				while(vehicleBeans != null && !vehicleBeans.isEmpty()) {
+					VehicleBean vehicleBean = vehicleBeans.pollFirst();
+					VehicleLabel vehicleLabel = new VehicleLabel(vehicleBean.getCarType(), 
+							vehicleBean.getPlateNumber(), vehicleBean.getDestination(), vehicleBean.getPrice());
+					vehicleLabel.setBounds(20, count * 100, 1000, 100);
+					jlVehicles.add(vehicleLabel);
+					count++;
+				}
+				if(count == 0) {
+					jlVehicles.setPreferredSize(new Dimension(1000, 600));
+					JLabel label = new JLabel(response.getMsg(), JLabel.CENTER);
+					label.setIcon(new ImageIcon("./icons/uncomplete.png"));
+					label.setFont(new Font("Consolas", 1, 25));
+					label.setForeground(Color.DARK_GRAY);
+					label.setBounds(0, 0, 1000, 200);
+					jlVehicles.add(label);
+				}
+				else {
+					jlVehicles.setPreferredSize(new Dimension(1000, count * 100));
+				}
+				
 			}
 		}
 	}

@@ -1,19 +1,26 @@
 package view.dialogs;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import view.MainView;
 
 public class ReserveHotelDialog extends JDialog implements ActionListener, MouseListener {
 
@@ -35,12 +42,14 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 	private JLabel jlSubIcon;
 	private JButton jbSelect;
 	
-	int roomType = -1;
-	int[] freeRoomNums = {14, 27, 4};
+	private String hotelNumber;
+	private int roomType = -1;
+	private int[] freeRoomNums = {-1, -1, -1};
 	
-	public ReserveHotelDialog() {
+	public ReserveHotelDialog(String id) {
 		// TODO Auto-generated constructor stub
 		this.dialog = this;
+		this.hotelNumber = id;
 		
 		setSize(430, 260);
 		setResizable(false);
@@ -52,9 +61,26 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 		int y = (h - 260) / 2;
 		setLocation(x, y);
 		
+		Map<String, String> args = new HashMap<>();
+		args.put("hotelNumber", id);
+		RequestMsg request = new RequestMsg(RequestMsg.SELECT_VACANT_ROOMS);
+		request.setArgs(args);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle();
+		freeRoomNums = (int[]) response.getData();
+		
+		request = new RequestMsg(RequestMsg.SELECT_ROOM_PRICE);request.setArgs(args);
+		request.sendRequest();
+		response = Controller.handle();
+		float[] roomPrices = (float[]) response.getData();
+		
 		JLabel jlRoom1 = new JLabel("大床房");
 		jlRoom1.setFont(new Font("", 1, 18));
 		jlRoom1.setBounds(30, 30, 80, 20);
+		JLabel jlRoomPrice1 = new JLabel(roomPrices[0] + "/Pre");
+		jlRoomPrice1.setFont(new Font("Consola", 0, 14));
+		jlRoomPrice1.setForeground(new Color(48, 151, 187));
+		jlRoomPrice1.setBounds(120, 36, 80, 14);
 		jbChoose1 = new JButton("选 择");
 		jbChoose1.setFont(new Font("", 0, 14));
 		jbChoose1.setForeground(Color.WHITE);
@@ -70,6 +96,10 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 		JLabel jlRoom2 = new JLabel("标准间");
 		jlRoom2.setFont(new Font("", 1, 18));
 		jlRoom2.setBounds(30, 70, 80, 20);
+		JLabel jlRoomPrice2 = new JLabel(roomPrices[1] + "/Pre");
+		jlRoomPrice2.setFont(new Font("Consola", 0, 14));
+		jlRoomPrice2.setForeground(new Color(48, 151, 187));
+		jlRoomPrice2.setBounds(120, 76, 80, 14);
 		jbChoose2 = new JButton("选 择");
 		jbChoose2.setFont(new Font("", 0, 14));
 		jbChoose2.setForeground(Color.WHITE);
@@ -85,6 +115,10 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 		JLabel jlRoom3 = new JLabel("高级套房");
 		jlRoom3.setFont(new Font("", 1, 18));
 		jlRoom3.setBounds(30, 110, 80, 20);
+		JLabel jlRoomPrice3 = new JLabel(roomPrices[2] + "/Pre");
+		jlRoomPrice3.setFont(new Font("Consola", 0, 14));
+		jlRoomPrice3.setForeground(new Color(48, 151, 187));
+		jlRoomPrice3.setBounds(120, 116, 80, 14);
 		jbChoose3 = new JButton("选 择");
 		jbChoose3.setFont(new Font("", 0, 14));
 		jbChoose3.setForeground(Color.WHITE);
@@ -127,6 +161,9 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 		jPanel.add(jlRoom1);
 		jPanel.add(jlRoom2);
 		jPanel.add(jlRoom3);
+		jPanel.add(jlRoomPrice1);
+		jPanel.add(jlRoomPrice2);
+		jPanel.add(jlRoomPrice3);
 		jPanel.add(jbChoose1);
 		jPanel.add(jbChoose2);
 		jPanel.add(jbChoose3);
@@ -148,14 +185,23 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 		if(e.getSource().equals(jbChoose1)) {
 			roomType = 0;
 			jlNum.setText("0");
+			jbChoose1.setBackground(new Color(102, 167, 232));
+			jbChoose2.setBackground(Color.GRAY);
+			jbChoose3.setBackground(Color.GRAY);
 		}
 		else if(e.getSource().equals(jbChoose2)) {
 			roomType = 1;
 			jlNum.setText("0");
+			jbChoose1.setBackground(Color.GRAY);
+			jbChoose2.setBackground(new Color(102, 167, 232));
+			jbChoose3.setBackground(Color.GRAY);
 		}
 		else if(e.getSource().equals(jbChoose3)) {
 			roomType = 2;
 			jlNum.setText("0");
+			jbChoose1.setBackground(Color.GRAY);
+			jbChoose2.setBackground(Color.GRAY);
+			jbChoose3.setBackground(new Color(102, 167, 232));
 		}
 		else if(e.getSource().equals(jbSelect)) {
 			int n = Integer.parseInt(jlNum.getText());
@@ -163,7 +209,25 @@ public class ReserveHotelDialog extends JDialog implements ActionListener, Mouse
 				
 			}
 			else {
-				
+				Map<String, String> args = new HashMap<>();
+				args.put("username", MainView.currentUser);
+				args.put("hotelNumber", hotelNumber);
+				String[] type = {"大床房", "标准间", "高级套房"};
+				args.put("roomType", type[roomType]);
+				args.put("roomNum", n + "");
+				RequestMsg request = new RequestMsg(RequestMsg.RESERVE_HOTEL);
+				request.setArgs(args);
+				request.sendRequest();
+				ResponseMsg response = Controller.handle().sendResponse();
+				if(response.getResult().equals("success")) {
+					JOptionPane.showMessageDialog(dialog, response.getMsg(),
+							"", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else {
+					JOptionPane.showMessageDialog(dialog, response.getMsg(),
+							"", JOptionPane.ERROR_MESSAGE);
+				}
+				dialog.setVisible(false);
 			}
 		}
 	}

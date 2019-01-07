@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -13,6 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
+import model.beans.HotelBean;
 import view.MainView;
 
 public class HotelPage extends JPanel implements MouseListener {
@@ -24,6 +31,9 @@ public class HotelPage extends JPanel implements MouseListener {
 	
 	private JTextField jtfCity;
 	private JLabel jlSearch;
+	private JPanel jlHotels;
+	
+	private String currentCity = "南京";
 	
 	public HotelPage(JFrame f) {
 		// TODO Auto-generated constructor stub
@@ -32,7 +42,7 @@ public class HotelPage extends JPanel implements MouseListener {
 		this.setBackground(new Color(240, 240, 240));
 		this.setLayout(null);
 		
-		jtfCity = new JTextField("北京", JTextField.CENTER);
+		jtfCity = new JTextField(currentCity, JTextField.CENTER);
 		jtfCity.setBackground(Color.WHITE);
 		jtfCity.setFont(new Font("", 1, 24));
 		jtfCity.setBorder(null);
@@ -52,44 +62,33 @@ public class HotelPage extends JPanel implements MouseListener {
 		jpTop.setBounds(0, 0, 1060, 120);
 		jpTop.setBackground(Color.WHITE);
 		
-		int size = 10;
-		JPanel jlHotels = new JPanel(null);
+		Map<String, String> args = new HashMap<>();
+		args.put("location", currentCity);
+		RequestMsg request = new RequestMsg(RequestMsg.SEARCH_HOTEL);
+		request.setArgs(args);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle();
+		@SuppressWarnings("unchecked")
+		LinkedList<HotelBean> hotelBeans = (LinkedList<HotelBean>) response.getData();
+		
+		jlHotels = new JPanel(null);
 		jlHotels.setBackground(new Color(255, 255, 255));
-		jlHotels.setPreferredSize(new Dimension(1000, size * 100));
-		HotelLabel hotelLabel0 = new HotelLabel();
-		hotelLabel0.setBounds(20, 0, 1000, 100);
-		HotelLabel hotelLabel1 = new HotelLabel();
-		hotelLabel1.setBounds(20, 100, 1000, 100);
-		HotelLabel hotelLabel2 = new HotelLabel();
-		hotelLabel2.setBounds(20, 200, 1000, 100);
-		HotelLabel hotelLabel3 = new HotelLabel();
-		hotelLabel3.setBounds(20, 300, 1000, 100);
-		HotelLabel hotelLabel4 = new HotelLabel();
-		hotelLabel4.setBounds(20, 400, 1000, 100);
-		HotelLabel hotelLabel5 = new HotelLabel();
-		hotelLabel5.setBounds(20, 500, 1000, 100);
-		HotelLabel hotelLabel6 = new HotelLabel();
-		hotelLabel6.setBounds(20, 600, 1000, 100);
-		HotelLabel hotelLabel7 = new HotelLabel();
-		hotelLabel7.setBounds(20, 700, 1000, 100);
-		HotelLabel hotelLabel8 = new HotelLabel();
-		hotelLabel8.setBounds(20, 800, 1000, 100);
-		HotelLabel hotelLabel9 = new HotelLabel();
-		hotelLabel9.setBounds(20, 900, 1000, 100);
-		jlHotels.add(hotelLabel0);
-		jlHotels.add(hotelLabel1);
-		jlHotels.add(hotelLabel2);
-		jlHotels.add(hotelLabel3);
-		jlHotels.add(hotelLabel4);
-		jlHotels.add(hotelLabel5);
-		jlHotels.add(hotelLabel6);
-		jlHotels.add(hotelLabel7);
-		jlHotels.add(hotelLabel8);
-		jlHotels.add(hotelLabel9);
+		int count = 0;
+		while(hotelBeans != null && !hotelBeans.isEmpty()) {
+			HotelBean hotelBean = hotelBeans.pollFirst();
+			HotelLabel hotelLabel = new HotelLabel(hotelBean.getHotelNumber(), hotelBean.getHotelName(), 
+					"位于" + currentCity + "市" + hotelBean.getAddress(), hotelBean.getFloorPrice());	
+			hotelLabel.setBounds(20, count * 100, 1000, 100);
+			jlHotels.add(hotelLabel);
+			count++;
+		}
+		
+		jlHotels.setPreferredSize(new Dimension(1000, count * 100));
 		JScrollPane jspHotels = new JScrollPane(jlHotels);
 		jspHotels.setBounds(1, 140, 1050, 610);
 		jspHotels.setBorder(null);
 		jspHotels.doLayout();
+		jspHotels.getVerticalScrollBar().setUnitIncrement(10);
 		
 		this.add(jlLine);
 		this.add(jtfCity);
@@ -106,6 +105,46 @@ public class HotelPage extends JPanel implements MouseListener {
 			MainView.selectCities.setLocation(frame.getX() + 440, frame.getY() + 140);
 			MainView.selectCities.setJtfCity(jtfCity);
 			MainView.selectCities.setVisible(true);
+		}
+		else if(e.getSource().equals(jlSearch)) {
+			if(jtfCity.getText().equals(currentCity)) {
+				
+			}
+			else {
+				currentCity = jtfCity.getText();
+				Map<String, String> args = new HashMap<>();
+				args.put("location", currentCity);
+				RequestMsg request = new RequestMsg(RequestMsg.SEARCH_HOTEL);
+				request.setArgs(args);
+				request.sendRequest();
+				ResponseMsg response = Controller.handle();
+				@SuppressWarnings("unchecked")
+				LinkedList<HotelBean> hotelBeans = (LinkedList<HotelBean>) response.getData();
+				
+				jlHotels.removeAll();
+				jlHotels.repaint();
+				int count = 0;
+				while(hotelBeans != null && !hotelBeans.isEmpty()) {
+					HotelBean hotelBean = hotelBeans.pollFirst();
+					HotelLabel hotelLabel = new HotelLabel(hotelBean.getHotelNumber(), hotelBean.getHotelName(), 
+							"位于" + currentCity + "市" + hotelBean.getAddress(), hotelBean.getFloorPrice());	
+					hotelLabel.setBounds(20, count * 100, 1000, 100);
+					jlHotels.add(hotelLabel);
+					count++;
+				}
+				if(count == 0) {
+					jlHotels.setPreferredSize(new Dimension(1000, 600));
+					JLabel label = new JLabel(response.getMsg(), JLabel.CENTER);
+					label.setIcon(new ImageIcon("./icons/uncomplete.png"));
+					label.setFont(new Font("Consolas", 1, 25));
+					label.setForeground(Color.DARK_GRAY);
+					label.setBounds(0, 0, 1000, 200);
+					jlHotels.add(label);
+				}
+				else {
+					jlHotels.setPreferredSize(new Dimension(1000, count * 100));
+				}
+			}
 		}
 	}
 

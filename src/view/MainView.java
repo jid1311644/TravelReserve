@@ -9,15 +9,17 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import controller.Controller;
+import controller.message.RequestMsg;
+import controller.message.ResponseMsg;
 import view.dialogs.CityDialog;
 import view.menu.MainButton;
 import view.menu.Menu;
 import view.pages.flightPage.FlightPage;
-import view.pages.reservationPage.ReservationPage;
 
 public class MainView extends JFrame {
 	
-	public static String currentUser;
+	public static String currentUser = "user1";
 	public static JPanel page;
 	public static CityDialog selectCities;
 	public static LinkedList<String> cities;
@@ -25,8 +27,6 @@ public class MainView extends JFrame {
 	public MainView() {
 		// TODO Auto-generated constructor stub
 		super();
-		
-		initData();
 		
 		setTitle("旅游订票系统");
 		setSize(1300, 800);
@@ -40,13 +40,12 @@ public class MainView extends JFrame {
 		Menu menu = new Menu(MainButton.FLIGHT, this);
 		menu.setBounds(0, 0, 241, 800);
 		
-//		new SocketServer();
-//		RunningPage.labelServices = new ArrayList<>();
 		page = new JPanel(null);
 		page.setBounds(241, 0, 1060, 800);
 		page.setBackground(Color.WHITE);
-		page.add(new ReservationPage(this));
+		page.add(new FlightPage(this));
 		
+		initCityData();
 		selectCities = new CityDialog(this);
 		
 		JPanel main = new JPanel(null);
@@ -57,227 +56,23 @@ public class MainView extends JFrame {
 		
 	}
 	
-	private boolean initData() {
-		cities = new LinkedList<>();
-		cities.add("鄂尔多斯");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("哈尔滨");
-		cities.add("鄂尔多斯");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
-		cities.add("北京");
-		cities.add("南京");
-		cities.add("西安");
+	@SuppressWarnings("unchecked")
+	private boolean initCityData() {
+		
+		RequestMsg request = new RequestMsg(RequestMsg.GET_CITIES_NAME);
+		request.sendRequest();
+		ResponseMsg response = Controller.handle();
+		cities = (LinkedList<String>) response.getData();
 		return true;
 	}
 	
 	protected void processWindowEvent(final WindowEvent e) {
 		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-			/*if(SocketServer.running.size() > 0) {
-				int n = JOptionPane.showConfirmDialog(this, "Something is running. Logout now?"
-						, "", JOptionPane.YES_NO_OPTION);
-				if(n == 0) {
-					System.exit(0);
-				}
-			}
-			else*/ {
-				int n = JOptionPane.showConfirmDialog(this, "Exit now?"
-						, "", JOptionPane.YES_NO_OPTION);
-				if(n == 0) {
-					System.exit(0);
-				}
+			
+			int n = JOptionPane.showConfirmDialog(this, "Exit now?"
+					, "", JOptionPane.YES_NO_OPTION);
+			if(n == 0) {
+				System.exit(0);
 			}
 		}
 		else {
@@ -285,8 +80,8 @@ public class MainView extends JFrame {
 		}
 	}
 	
-	public static void main(String[] args) {
-		new MainView().setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		new MainView().setVisible(true);
+//	}
 
 }

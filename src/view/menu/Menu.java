@@ -15,6 +15,7 @@ import view.MainView;
 import view.login.SignInUp;
 import view.pages.flightPage.FlightPage;
 import view.pages.hotelPage.HotelPage;
+import view.pages.reservationPage.ReservationPage;
 import view.pages.vehiclePage.VehiclePage;
 
 public class Menu extends JPanel implements MouseListener {
@@ -186,26 +187,18 @@ public class Menu extends JPanel implements MouseListener {
 			}
 		}
 		else if(e.getSource().equals(jlReservation)) {
-			
+			setButton(-1);
+			MainView.page.removeAll();
+			MainView.page.repaint();
+			MainView.page.add(new ReservationPage(frame));
 		}
 		else if(e.getSource().equals(jlLogout)) {
-			/*if(SocketServer.running.size() > 0) {
-				int n = JOptionPane.showConfirmDialog(frame, "Something is running. Logout now?"
-						, "", JOptionPane.YES_NO_OPTION);
-				if(n == 0) {
-					SignInUp gui = new SignInUp();
-					gui.setVisible(true);
-					frame.dispose();
-				}
-			}
-			else */{
-				int n = JOptionPane.showConfirmDialog(frame, "Logout now?"
-						, "", JOptionPane.YES_NO_OPTION);
-				if(n == 0) {
-					SignInUp gui = new SignInUp();
-					gui.setVisible(true);
-					frame.dispose();
-				}
+			int n = JOptionPane.showConfirmDialog(frame, "Logout now?"
+					, "", JOptionPane.YES_NO_OPTION);
+			if(n == 0) {
+				SignInUp gui = new SignInUp();
+				gui.setVisible(true);
+				frame.dispose();
 			}
 		}
 	}
