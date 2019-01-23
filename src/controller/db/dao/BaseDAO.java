@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public abstract class BaseDAO {
 
-	protected String driver; //Êı¾İ¿âÇı¶¯Àà
+	protected String driver; //æ•°æ®åº“é©±åŠ¨ç±»
 	protected String url;
 	protected String userName;
 	protected String userPassword;
@@ -17,12 +17,12 @@ public abstract class BaseDAO {
 		this.driver = "com.mysql.cj.jdbc.Driver";
 		this.url = "jdbc:mysql://localhost:3306/radb_reserve?serverTimezone=GMT%2B8&useSSL=false";
 		this.userName = "root";
-		this.userPassword = "Jellal20143647";
+		this.userPassword = "********";
 	}
 	
-	//´ò¿ªÊı¾İ¿âÁ¬½Ó
+	//æ‰“å¼€æ•°æ®åº“è¿æ¥
 	public Connection openDBConnection() {
-		//Á¬½ÓÊı¾İ¿â
+		//è¿æ¥æ•°æ®åº“
 		Connection c = null;
 		try {
 			Class.forName(driver);
@@ -41,7 +41,7 @@ public abstract class BaseDAO {
 
 	}
 	
-	//¹Ø±ÕÊı¾İ¿âÁ¬½Ó
+	//å…³é—­æ•°æ®åº“è¿æ¥
 	public boolean closeDBConnection(Connection c) {
 		if(c == null) {
 			return false;
@@ -57,13 +57,13 @@ public abstract class BaseDAO {
 		}
 	}
 	
-	//Ö´ĞĞsqlÓï¾ä²¢·µ»Ø½á¹û¶ÔÏó
+	//æ‰§è¡Œsqlè¯­å¥å¹¶è¿”å›ç»“æœå¯¹è±¡
 	public abstract Object query(String sql);
-	//Ö´ĞĞ²åÈëÊı¾İµÄsqlÓï¾ä²¢·µ»ØÖ´ĞĞ½á¹û
+	//æ‰§è¡Œæ’å…¥æ•°æ®çš„sqlè¯­å¥å¹¶è¿”å›æ‰§è¡Œç»“æœ
 	public abstract boolean insert(String sql);
-	//Ö´ĞĞ¸üĞÂÊı¾İµÄsqlÓï¾ä²¢·µ»ØÖ´ĞĞ½á¹û
+	//æ‰§è¡Œæ›´æ–°æ•°æ®çš„sqlè¯­å¥å¹¶è¿”å›æ‰§è¡Œç»“æœ
 	public abstract boolean update(String sql);
-	//Ö´ĞĞÉ¾³ıÊı¾İµÄsqlÓï¾ä²¢·µ»ØÖ´ĞĞ½á¹û
+	//æ‰§è¡Œåˆ é™¤æ•°æ®çš„sqlè¯­å¥å¹¶è¿”å›æ‰§è¡Œç»“æœ
 	public abstract boolean delete(String sql);
 	
 }
